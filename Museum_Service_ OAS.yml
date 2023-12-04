@@ -1,0 +1,455 @@
+openapi: 3.0.3
+info:
+
+  title: Museum Service
+  description: Museum API
+  termsOfService: http://swagger.io/terms/
+  
+  contact:
+    name: API Support
+    url: http://www.swagger.io/support
+    email: l20140906@queretaro.tecnm.mx
+    
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+  
+tags:
+  - name: ArtWork
+    description: Operations related with the ArtWork resource
+  - name: User
+    description: Operations related with the user resource
+  - name: Hall
+    description: Operations related with the Hall resource
+  - name: Museum
+    description: Operations related with the Museum resource
+
+paths:
+
+  /artwork:
+  
+    get:
+      tags:
+        - ArtWork
+      summary: Get one or more ArtWork(s)
+      description: Get all the ArtWorks stored in the museum (if query param "idArtWork" is not provided) or a single ArtWork (that matches the requested idArtWork) or do a query depending on the (technique, name or author) params
+      operationId: getArtWorks
+      parameters:
+        - in: query
+          name: idArtWork
+          required: false
+          schema:
+            type: integer
+          description: Optional query param "idArtWork" for quering one specific ArtWork
+        - in: query
+          name: technique
+          required: false
+          schema:
+            type: string
+          description: Technique of the art work to consult
+        - in: query
+          name: name
+          required: false
+          schema:
+            type: string
+          description: Name of the art work to consult
+        - in: query
+          name: author
+          required: false
+          schema:
+            type: string
+          description: Author of the art work to consult
+      responses:
+        '200':
+          description: Succesful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArtWork'
+        '400':
+          description: Bad Request, invalid field or query param (idArtWork)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '404':
+          description: No ArtWorks found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+
+    post:
+      tags:
+        - ArtWork
+      summary: Add a new art work to the museum
+      description: Add a new art work to the museum
+      operationId: insertArtWork
+      requestBody:
+        required: true
+        description: Create a new art work in the museum
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtWorkInsert'
+              
+      responses:
+        '201':
+          description: Art work created!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtWork'
+        '400':
+          description: Invalid input. Verify your fields (requestBody)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+    
+    put:
+      tags:
+        - ArtWork
+      summary: Update an ArtWork
+      description: Update the location (idHall) or availability of an ArtWork by ID, (wich is provided through the frontend to the requestBody along with the other two optional fields)
+      operationId: updateArtWork
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtWorkUpdate'
+      responses:
+        '200':
+          description: Art work location updated!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtWork'
+        '400':
+          description: Invalid input (Wrong ID ArtWork or ID Hall)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '404':
+          description: ArtWork to put not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+
+    delete:
+      tags:
+        - ArtWork
+      summary: Delete an ArtWork
+      description: Delete an ArtWork by a given ID through query param "idArtWork", wich in this case it is required
+      operationId: deleteArtwork
+      parameters:
+        - in: query
+          name: idArtWork
+          required: true
+          schema:
+            type: integer
+          description: ID of the artwork to delete
+      responses:
+        '200':
+          description: Art work deleted!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '400':
+          description: Bad request (Invalid ArtWork ID or query param)
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Ack'
+        '404':
+          description: ArtWork to delete not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Ack'
+
+
+components:
+
+  schemas:
+    # Define the properties of an ArtWork
+    ArtWork:
+      type: object
+      required:
+        - idArtWork
+        - idHall
+        - name
+        - author
+        - technique
+        - description
+        - year
+        - permanent
+        - availability
+      properties:
+        idArtWork:
+          type: integer
+          description: Unique identifier for an ArtWork
+          format: int64
+          example: 12
+        idHall:
+          type: integer
+          description: Foreign key of the Hall
+          format: int64
+          example: 12
+        name:
+          type: string
+          description: Name of the ArtWork
+          maxLength: 70
+          example: Mona Lisa
+        author:
+          type: string
+          description: Name of the ArtWork's author
+          maxLength: 30
+          example: Picasso
+        technique:
+          type: string
+          description: Name of the technique/method which the ArtWork was made
+          maxLength: 50
+          example: Oil on canvas
+        description:
+          type: string
+          description: Additional info about the ArtWork
+          maxLength: 100
+          example: Contemporary art work from 2013
+        year:
+          type: string
+          description: Year the ArtWork was released.
+          maxLength: 15
+          example: 2013
+        permanent:
+          type: boolean
+          description: Info about wheter the ArtWork is owned by the Museum or is on loan (true if it is owned)
+          example: true
+        availability:
+          type: boolean
+          description: To know if the ArtWork is currently in the museum the museum true if it is)
+          example: 0
+      description: Params/structure for an ArtWork
+    
+    # Structure of a requestBody for a new ArtWork insertion
+    ArtWorkInsert:    
+      type: object
+      required:
+        - idHall
+        - name
+        - author
+        - technique
+        - description
+        - year
+        - permanent
+        - availability
+      properties:
+        idHall:
+          type: integer
+          description: Foreign key of the Hall
+          format: int64
+          example: 12
+        name:
+          type: string
+          description: Name of the ArtWork
+          maxLength: 70
+          example: Mona Lisa
+        author:
+          type: string
+          description: Name of the ArtWork's author
+          maxLength: 30
+          example: Picasso
+        technique:
+          type: string
+          description: Name of the technique/method which the ArtWork was made
+          maxLength: 50
+          example: Oil on canvas
+        description:
+          type: string
+          description: Additional info about the ArtWork
+          maxLength: 100
+          example: Contemporary art work from 2013
+        year:
+          type: string
+          description: Year the ArtWork was released.
+          maxLength: 15
+          example: 2013
+        permanent:
+          type: boolean
+          description: Info about wheter the ArtWork is owned by the Museum or is on loan (true if it is owned)
+          example: true
+        availability:
+          type: boolean
+          description: To know if the ArtWork is currently in the museum the museum true if it is)
+          example: 0
+      description: Schema of an ArtWork when it is posted
+    
+    # Schema for the requestBody for an ArtWork update
+    ArtWorkUpdate:
+      type: object
+      required:
+        - idArtWork
+      properties:
+        idArtWork:
+          type: integer
+          description: ID of the requested ArtWork
+          example: 1
+        idHall:
+          type: integer
+          description: Foreign key of the Hall
+          format: int64
+          example: 12
+        availability:
+          type: boolean
+          description: To know if the artwork is currently available on the hall
+          example: true
+      description: Structure for the requestBody used in the location update method
+  
+    # Defining User properties.
+    User:
+      type: object
+      required:
+        - idUser
+        - idMuseum
+        - name
+        - lastName
+        - email
+      properties:
+        idUser:
+          type: integer
+          description: Unique identifier of a User
+          format: int64
+          example: 1
+        idMuseum:
+          type: integer
+          description: Foreign key of the Museum
+          format: int64
+          example: 1
+        name:
+          type: string
+          description: Name of a User
+          maxLength: 25
+          example: Juan
+        lastName:
+          type: string
+          description: Last name of a user
+          maxLength: 25
+          example: Juarez
+        phoneNumber:
+          type: string
+          description: Phone number of a User
+          minLength: 10
+          maxLength: 15
+          example: 4427122463
+        age:
+          type: integer
+          description: Age of a User
+          minimum: 15
+          example: 26
+        email:
+          type: string
+          description: Email of a User
+          maxLength: 50
+          example: userone@museum.com
+        connected:
+          type: boolean
+          description: Indicates if a user is connected or not
+          example: true
+      description: Params/structure for a User.
+
+    # Defining Hall properties
+    Hall:
+      type: object
+      required:
+        - idHall
+        - idMuseum
+        - name
+        - availability
+      properties:
+        idHall:
+          type: integer
+          description: Unique identifier for a Hall
+          format: int64
+          example: 1
+        idMuseum:
+          type: integer
+          description: Foreign key of the Museum
+          format: int64
+          example: 1
+        name:
+          type: string
+          description: Name of the Hall
+          maxLength: 50
+          example: Salon Paloma
+        availability:
+          type: boolean
+          description: Indicates if the Hall is open or closed (true if it is open)
+          example: true
+      description: Params/structure for a Hall
+    
+    # Defining the Museum properties
+    Museum:
+      type: object
+      required:
+        - idMuseum
+        - name
+      properties:
+        idMuseum:
+          type: integer
+          description: Unique identifier for a Museum
+          format: int64
+          example: 1
+        name:
+          type: string
+          description: Unique identifier for a Museum
+          maxLength: 35
+          format: int64
+          example: Museo Soumaya
+      description: Params/structure for a Museum
+    
+    # Defining the response code for this service
+    Ack:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Response code returned by the API
+          format: int32
+          example: 200
+        message:
+          type: string
+          description: Additional info about the response
+          maxLength: 100
+          example: Request received by the service!
+      description: Response code of the service

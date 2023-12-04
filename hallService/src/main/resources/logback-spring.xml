@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+<configuration>
+
+	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+	<include resource="org/springframework/boot/logging/logback/file-appender.xml" />
+
+	<!-- Appender de la consola -->
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<charset>UTF-8</charset>
+			<!-- Formato de los mensajes de LOG -->
+			<pattern>\n[%d{dd/MMMM/yyyy HH:mm:ss:SSS}] [%t] %-5p %c at line[%L] : %m%n \n</pattern>
+			<!-- [17/noviembre/2023 14:25:30:123] [main] INFO com.itq.clase at line[42] : This is a sample log message -->
+		</encoder>
+	</appender>
+
+	<!-- Appender de los archivos de LOG -->
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>./logs/hallservice.log</file>
+		<!-- Política de rotación de archivos de LOG -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>./logs/hallservice_%d{dd-MM-yyyy}_%i.log</fileNamePattern>
+			<maxFileSize>10MB</maxFileSize>
+			<maxHistory>10</maxHistory>
+			<totalSizeCap>100MB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<charset>UTF-8</charset>
+			<!-- Formato de los mensajes de LOG -->
+			<pattern>\n[%d{dd/MMMM/yyyy HH:mm:ss:SSS}] [%t] %-5p %c at line[%L] : %m%n \n</pattern>
+		</encoder>
+	</appender>
+	   
+	<root level="DEBUG">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="FILE" />
+	</root>
+
+</configuration>
