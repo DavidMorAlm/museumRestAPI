@@ -136,7 +136,7 @@ paths:
               $ref: '#/components/schemas/ArtWorkUpdate'
       responses:
         '200':
-          description: Art work location updated!
+          description: Art work updated!
           content:
             application/json:
               schema:
@@ -188,6 +188,159 @@ paths:
                   $ref: '#/components/schemas/Ack'
         '404':
           description: ArtWork to delete not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Ack'
+
+  /user:
+    get:
+      tags:
+        - User
+      summary: Get one or more User(s)
+      description: Get a all Users if "idUser" is not provided or a single User (that matches the requested idArtWork)
+      operationId: getUsers
+      parameters:
+        - in: query
+          name: idUser
+          required: false
+          schema:
+            type: integer
+          description: Optional query param "idUser" for quering one specific User
+      responses:
+        '200':
+          description: Succesful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '204':
+          description: No User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Bad request, check your petition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+
+    post:
+      tags:
+        - User
+      summary: Add a new user to the museum
+      description: Add a new user to the museum
+      operationId: insertUser
+      requestBody:
+        required: true
+        description: Create a new user in the museum
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInsert'
+              
+      responses:
+        '201':
+          description: Art work created!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInsert'
+        '400':
+          description: Invalid petition. Verify your fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+    
+    put:
+      tags:
+        - User
+      summary: Update phone number or email of a User
+      description: Update the phone number (phoneNUmber) or email (email) of the requested User
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: User updated!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '204':
+          description: User to update not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '400':
+          description: Invalid input (Wrong ID ArtWork or ID Hall)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+
+    delete:
+      tags:
+        - User
+      summary: Delete a User
+      description: Delete a User by a given ID through query param "idUser", wich in this case it's required
+      operationId: deleteUser
+      parameters:
+        - in: query
+          name: idUser
+          required: true
+          schema:
+            type: integer
+          description: ID of the User to delete
+      responses:
+        '200':
+          description: User deleted!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ack'
+        '204':
+          description: No User found for idUser provided
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Ack'
+        '400':
+          description: Bad petition
           content:
             application/json:
               schema:
@@ -387,6 +540,75 @@ components:
           description: Indicates if a user is connected or not
           example: true
       description: Params/structure for a User.
+      
+    # Structure of a requestBody for a new ArtWork insertion
+    UserInsert:    
+      type: object
+      required:
+        - idMuseum
+        - name
+        - lastName
+        - email
+      properties:
+        idMuseum:
+          type: integer
+          description: Foreign key of the Museum
+          format: int64
+          example: 1
+        name:
+          type: string
+          description: Name of a User
+          maxLength: 25
+          example: Juan
+        lastName:
+          type: string
+          description: Last name of a user
+          maxLength: 25
+          example: Juarez
+        phoneNumber:
+          type: string
+          description: Phone number of a User
+          minLength: 10
+          maxLength: 15
+          example: 4427122463
+        age:
+          type: integer
+          description: Age of a User
+          minimum: 15
+          example: 26
+        email:
+          type: string
+          description: Email of a User
+          maxLength: 50
+          example: userone@museum.com
+        connected:
+          type: boolean
+          description: Indicates if a user is connected or not
+          example: true
+      description: Params/structure for a User when its posted.
+      
+    # Schema for the requestBody for an ArtWork update
+    UserUpdate:
+      type: object
+      required:
+        - idUser
+      properties:
+        idUser:
+          type: integer
+          description: ID of the User to update
+          example: 1
+        phoneNumber:
+          type: string
+          description: Phone number of a User
+          minLength: 10
+          maxLength: 15
+          example: 4427122463
+        email:
+          type: string
+          description: Email of a User
+          maxLength: 50
+          example: userone@museum.com
+      description: Structure for the requestBody used in the user update method
 
     # Defining Hall properties
     Hall:
