@@ -23,6 +23,7 @@ import com.itq.userservice.dto.Ack;
 import com.itq.userservice.dto.User;
 import com.itq.userservice.dto.UserInsert;
 import com.itq.userservice.dto.UserUpdate;
+import com.itq.userservice.exception.DuplicatedUserException;
 import com.itq.userservice.exception.InvalidRequestException;
 import com.itq.userservice.exception.MuseumNotFoundException;
 import com.itq.userservice.exception.UserNotFoundException;
@@ -96,7 +97,13 @@ public class UserServiceController {
 			LOGGER.error("ERROR INSERTING USER, MUSEUM " +user.getIdMuseum() +" NOT FOUND IN THE DATA BASE", e);
 			return new ResponseEntity<>(new Ack(404, "ERROR INSERTING USER, MUSEUM " +user.getIdMuseum() +" NOT FOUND IN THE DATA BASE"), HttpStatus.NOT_FOUND);
 
-		} catch (Exception e) {
+		} catch (DuplicatedUserException e){
+
+			LOGGER.error("ERROR INSERTING USER, USER: " +user.getName() +" " +user.getLastName() +" ALREADY EXISTS IN THE MUSEUM " +user.getIdMuseum(), e);
+			return new ResponseEntity<>(new Ack(409, "ERROR INSERTING USER, USER: " +user.getName() +" " +user.getLastName() +" ALREADY EXISTS IN THE MUSEUM \" +user.getIdMuseum()"), HttpStatus.CONFLICT);
+
+		}
+		catch (Exception e) {
 
 			LOGGER.error("ERROR INSERTING USER", e);
 			return new ResponseEntity<>(new Ack(500, "ERROR INSERTING USER"), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -128,11 +135,12 @@ public class UserServiceController {
 
 	@DeleteMapping("/user")
 	public ResponseEntity<?> deleteUser(@RequestParam(value = "idUser", required = true) Integer idUser) {
-
+		
 		try {
 
+			User user = userBusiness.getUserByID(idUser);
 			userBusiness.deleteUser(idUser);
-			return new ResponseEntity<>(new Ack(200, "USER DELETED"), HttpStatus.OK);
+			return new ResponseEntity<>(new Ack(200, "USER: " + user.getName() +" " +user.getLastName() + " DELETED"), HttpStatus.OK);
 
 		} catch (UserNotFoundException e) {
 

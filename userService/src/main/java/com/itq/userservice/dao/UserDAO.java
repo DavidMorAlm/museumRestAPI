@@ -20,6 +20,7 @@ import com.itq.userservice.dto.Ack;
 import com.itq.userservice.dto.User;
 import com.itq.userservice.dto.UserInsert;
 import com.itq.userservice.dto.UserUpdate;
+import com.itq.userservice.exception.DuplicatedUserException;
 import com.itq.userservice.exception.MuseumNotFoundException;
 import com.itq.userservice.exception.UserNotFoundException;
 
@@ -78,27 +79,6 @@ public class UserDAO {
 
 	}
 
-    public List<Integer> getUsersIDs() throws UserNotFoundException {
-
-        String sql = "SELECT idUser FROM User";
-        LOGGER.info("GETTING USERS IDs");
-        return jdbcTemplate.query(sql,new RowMapper<Integer>() {
-            @Override
-            public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Integer idUser = Integer.valueOf(rs.getInt("idUser"));
-                return idUser;
-            }
-
-        });
-
-    }
-
-    public boolean existsUserID(int idUser) throws UserNotFoundException {
-
-        return getUsersIDs().contains(idUser);
-
-    }
-
     public User insertUser(UserInsert user) throws Exception {
 
         String sql = "INSERT INTO user (idMuseum, name, lastName, phoneNumber, email, age, connected) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -109,6 +89,12 @@ public class UserDAO {
 
             LOGGER.error("THE MUSEUM " +user.getIdMuseum() +" WAS NOT FOUND IN THE DATA BASE");
             throw new MuseumNotFoundException("THE MUSEUM " +user.getIdMuseum() +" WAS NOT FOUND IN THE DATA BASE");
+
+        }
+        else if(existsUserFullNameAndMuseum(user.getName(), user.getLastName(), user.getIdMuseum())){
+
+            LOGGER.error("THE USER " +user.getName() +" " +user.getLastName() +" ALREADY EXIST IN THE MUSEUM " +user.getIdMuseum());
+            throw new DuplicatedUserException("THE USER " +user.getName() +" " +user.getLastName() +" ALREADY EXISTS IN THE MUSEUM " +user.getIdMuseum());
 
         }
         else{
@@ -130,25 +116,6 @@ public class UserDAO {
             return new User(user, keyHolder.getKey().intValue());
 
         }
-    }
-
-    private boolean existMuseumID(int idMuseum) {
-        return getMuseumIDs().contains(idMuseum);
-    }
-
-    public List<Integer> getMuseumIDs() throws MuseumNotFoundException {
-
-        String sql = "SELECT idMuseum FROM Museum";
-        LOGGER.info("GETTING MUSEUM IDs");
-        return jdbcTemplate.query(sql,new RowMapper<Integer>() {
-            @Override
-            public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Integer idMuseum = Integer.valueOf(rs.getInt("idMuseum"));
-                return idMuseum;
-            }
-
-        });
-
     }
 
     public User updateUser(UserUpdate user) throws Exception {
@@ -215,10 +182,70 @@ public class UserDAO {
 
             LOGGER.info("DELETING USER");
             jdbcTemplate.update(sql, idUser);
-            LOGGER.info("USER DELETED");
+            LOGGER.info("USER: " + userResult.getName() +" " +userResult.getLastName() + " DELETED");
             return userResult;
 
         }
+    }
+
+    public List<Integer> getUsersIDs() throws UserNotFoundException {
+
+        String sql = "SELECT idUser FROM User";
+        LOGGER.info("GETTING USERS IDs");
+        return jdbcTemplate.query(sql,new RowMapper<Integer>() {
+            @Override
+            public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Integer idUser = Integer.valueOf(rs.getInt("idUser"));
+                return idUser;
+            }
+
+        });
+
+    }
+
+    public boolean existsUserID(int idUser) throws UserNotFoundException {
+
+        return getUsersIDs().contains(idUser);
+
+    }
+
+    public List<Integer> getMuseumIDs() throws MuseumNotFoundException {
+
+        String sql = "SELECT idMuseum FROM Museum";
+        LOGGER.info("GETTING MUSEUM IDs");
+        return jdbcTemplate.query(sql,new RowMapper<Integer>() {
+            @Override
+            public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Integer idMuseum = Integer.valueOf(rs.getInt("idMuseum"));
+                return idMuseum;
+            }
+
+        });
+
+    }
+
+    private boolean existMuseumID(int idMuseum) {
+        return getMuseumIDs().contains(idMuseum);
+    }
+
+    public List<String> getUserFullNameAndMuseum() throws UserNotFoundException{
+            
+            String sql = "SELECT name, lastName, idMuseum FROM user";
+            LOGGER.info("GETTING USER FULL NAME AND MUSEUM WHERE HE/SHE BELONGS");
+            return jdbcTemplate.query(sql,new RowMapper<String>() {
+                @Override
+                public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    String name = rs.getString("name");
+                    String lastName = rs.getString("lastName");
+                    int idMuseum = rs.getInt("idMuseum");
+                    return name + " " + lastName + " " + idMuseum;
+                }
+    
+            });
+    }
+
+    public boolean existsUserFullNameAndMuseum(String name, String lastName, int idMuseum) throws UserNotFoundException{
+        return getUserFullNameAndMuseum().contains(name + " " + lastName +" " + idMuseum);
     }
 
 }
