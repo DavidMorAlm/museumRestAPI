@@ -2,18 +2,24 @@ package com.itq.userservice.service;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.itq.userservice.business.UserBusiness;
 import com.itq.userservice.dto.Ack;
 import com.itq.userservice.dto.User;
+import com.itq.userservice.dto.UserInsert;
 import com.itq.userservice.exception.InvalidRequestException;
+import com.itq.userservice.exception.MuseumNotFoundException;
 import com.itq.userservice.exception.UserNotFoundException;
 
 @RestController
@@ -55,8 +61,8 @@ public class UserServiceController {
 		}
 		catch (UserNotFoundException e) {
 			
-			LOGGER.error("ERROR GETING USERS, USER NOT FOUND", e);
-			return new ResponseEntity<>(new Ack(404, "404,ERROR GETING USERS, USER NOT FOUND"), HttpStatus.NOT_FOUND);
+			LOGGER.error("ERROR GETING USERS, USER NOT FOUND IN THE DATA BASE", e);
+			return new ResponseEntity<>(new Ack(404, "404,ERROR GETING USERS, USER NOT FOUND IN THE DATA BASE"), HttpStatus.NOT_FOUND);
 			
 		}
 		catch (InvalidRequestException e) {
@@ -70,5 +76,27 @@ public class UserServiceController {
 			return new ResponseEntity<>(new Ack(500, "INTERNAL SERVER ERROR"),HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
+	}
+
+	@PostMapping(value = "/user", consumes = "application/json", produces = "application/json")
+	public ResponseEntity<?> insertUser(@Valid @RequestBody UserInsert user) {
+
+		try {
+
+			User insertedUser = userBusiness.insertUser(user);
+			return new ResponseEntity<>(insertedUser, HttpStatus.CREATED);
+		
+		} catch (MuseumNotFoundException e) {
+			
+			LOGGER.error("ERROR INSERTING USER, MUSEUM " +user.getIdMuseum() +" NOT FOUND IN THE DATA BASE", e);
+			return new ResponseEntity<>(new Ack(404, "ERROR INSERTING USER, MUSEUM " +user.getIdMuseum() +" NOT FOUND IN THE DATA BASE"), HttpStatus.NOT_FOUND);
+
+		} catch (Exception e) {
+
+			LOGGER.error("ERROR INSERTING USER", e);
+			return new ResponseEntity<>(new Ack(500, "ERROR INSERTING USER"), HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+
 	}
 }

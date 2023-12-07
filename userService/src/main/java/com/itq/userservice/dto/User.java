@@ -59,6 +59,19 @@ public class User {
 		this.email = email;
 		this.connected = connected;
 	}
+
+	public User(UserInsert newUser, int idUser){
+
+		this.idUser = idUser;
+		this.idMuseum = newUser.getIdMuseum();
+		this.name = newUser.getName();
+		this.lastName = newUser.getLastName();
+		this.phoneNumber = newUser.getPhoneNumber();
+		this.age = newUser.getAge();
+		this.email = newUser.getEmail();
+		this.connected = newUser.isConnected();
+	
+	}
 	
 	public int getIdUser() {
 		return idUser;
