@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.itq</groupId>
-	<artifactId>artworkservice</artifactId>
+	<artifactId>userservice</artifactId>
 	<version>1.0.0</version>
-	<name>artworkservice</name>
-	<description>REST API implementation that controls operations related with the ArtWork resource of a Museum</description>
+	<name>userservice</name>
+	<description>REST API implementation that controls operations related with the User resource of a Museum</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
