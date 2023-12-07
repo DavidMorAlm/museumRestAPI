@@ -28,9 +28,9 @@ public class UserServiceController {
 	@GetMapping("/user")
 	public ResponseEntity<?> getUsers(@RequestParam(value = "idUser", required = false) Integer idUser) {
 
-		if (idUser == null) {
-			try {
-				
+		try{
+			if (idUser == null) {
+					
 				List<User> user = userBusiness.getAllUsers();
 				
 				if(user.isEmpty()) {
@@ -45,41 +45,30 @@ public class UserServiceController {
 					return new ResponseEntity<>(user, HttpStatus.OK);
 					
 				}
-			}  catch (InvalidRequestException e) {
-				
-				LOGGER.error("ERROR GETING USERS, VERIFY URL", e);
-				return new ResponseEntity<>(new Ack(404, "404,ERROR GETING USERS, VERIFY URL"), HttpStatus.BAD_REQUEST);
-				
-			} catch (Exception e) {
-
-				LOGGER.error("ERROR GETTING USERS", e);
-				return new ResponseEntity<>(new Ack(500, "INTERNAL SERVER ERROR"),HttpStatus.INTERNAL_SERVER_ERROR);
-
 			}
-			
-		}
-		else {
-			
-			try {
+			else {
+				
 				User user = userBusiness.getUserByID(idUser);
 				return new ResponseEntity<>(user, HttpStatus.OK);
 
-			} catch (UserNotFoundException e) {
-
-				LOGGER.error("ERROR GETTING USER", e);
-				return new ResponseEntity<>(new Ack(404, e.getMessage()), HttpStatus.NOT_FOUND);
-
-			}catch (InvalidRequestException e) {
+			}
+		}
+		catch (UserNotFoundException e) {
+			
+			LOGGER.error("ERROR GETING USERS, USER NOT FOUND", e);
+			return new ResponseEntity<>(new Ack(404, "404,ERROR GETING USERS, USER NOT FOUND"), HttpStatus.NOT_FOUND);
+			
+		}
+		catch (InvalidRequestException e) {
 				
-				LOGGER.error("ERROR GETING USERS, VERIFY URL", e);
-				return new ResponseEntity<>(new Ack(404, "404,ERROR GETING USERS, VERIFY URL"), HttpStatus.BAD_REQUEST);
-				
-			} catch (Exception e) {
+			LOGGER.error("ERROR GETING USERS, VERIFY URL", e);
+			return new ResponseEntity<>(new Ack(404, "404,ERROR GETING USERS, VERIFY URL"), HttpStatus.BAD_REQUEST);
+			
+		} catch (Exception e) {
 
-				LOGGER.error("ERROR GETTING USER", e);
-				return new ResponseEntity<>(new Ack(500, "INTERNAL SERVER ERROR"), HttpStatus.INTERNAL_SERVER_ERROR);
+			LOGGER.error("ERROR GETTING USERS", e);
+			return new ResponseEntity<>(new Ack(500, "INTERNAL SERVER ERROR"),HttpStatus.INTERNAL_SERVER_ERROR);
 
-			}				
 		}
 	}
 }

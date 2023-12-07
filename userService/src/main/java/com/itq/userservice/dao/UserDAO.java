@@ -46,72 +46,44 @@ public class UserDAO {
     	}
     }
 	
-	public List<User> getAllUsers() throws Exception {
+	public List<User> getAllUsers(){
 
         String sql = "SELECT * FROM user";
-        
-        try {
+        LOGGER.info("SHOWING ALL USERS");
+        return jdbcTemplate.query(sql,new UserRowMapper());
 
-            LOGGER.info("SHOWING ALL USERS");
-            return jdbcTemplate.query(sql,new UserRowMapper());
-
-        } catch (Exception e) {
-
-            throw new Exception("THERE WAS A PROBLEM WHILE QUERING ARTWORKS", e);
-
-        }
 	}
 
 	public User getUserByID(int idUser) throws Exception {
         
         String sql = "SELECT * FROM user WHERE idUser = ?";
+        if(!existsUserID(idUser)){
 
-        try {
-
-            if(!existsUserID(idUser)){
-
-                LOGGER.error("THE USER " +idUser +" WAS NOT FOUND IN THE DATA BASE");
-                throw new UserNotFoundException("THE USER " +idUser +" WAS NOT FOUND IN THE DATA BASE");
-
-            }
-            else{
-
-                LOGGER.info("SHOWING USER WITH ID " +idUser);
-                return jdbcTemplate.queryForObject(sql, new UserRowMapper(), idUser);
-
-            }
-        }catch (UserNotFoundException e) {
-
+            LOGGER.error("THE USER " +idUser +" WAS NOT FOUND IN THE DATA BASE");
             throw new UserNotFoundException("THE USER " +idUser +" WAS NOT FOUND IN THE DATA BASE");
 
-        } catch (Exception e) {
+        }
+        else{
 
-            throw new Exception("THERE WAS A PROBLEM WHILE QUERING ARTWORKS", e);
+            LOGGER.info("SHOWING USER WITH ID " +idUser);
+            return jdbcTemplate.queryForObject(sql, new UserRowMapper(), idUser);
 
         }
+
 	}
 
     public List<Integer> getUsersIDs() throws UserNotFoundException {
 
         String sql = "SELECT idUser FROM User";
+        LOGGER.info("GETTING USERS IDs");
+        return jdbcTemplate.query(sql,new RowMapper<Integer>() {
+            @Override
+            public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Integer idUser = Integer.valueOf(rs.getInt("idUser"));
+                return idUser;
+            }
 
-        try {
-
-            LOGGER.info("GETTING USERS IDs");
-            return jdbcTemplate.query(sql,new RowMapper<Integer>() {
-                @Override
-                public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    Integer idUser = Integer.valueOf(rs.getInt("idUser"));
-                    return idUser;
-                }
-
-            });
-
-        } catch (UserNotFoundException e) {
-
-            throw new UserNotFoundException("THERE WAS A PROBLEM WHILE QUERING USERS IDs");
-
-        }
+        });
 
     }
 

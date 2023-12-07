@@ -23,7 +23,7 @@ public class UserBusiness {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceController.class);
 
-    public List<User> getAllUsers() throws Exception {
+    public List<User> getAllUsers(){
         List<User> user = userDAO.getAllUsers();
         if (user.isEmpty()) {
             LOGGER.debug("No USERS Found");
