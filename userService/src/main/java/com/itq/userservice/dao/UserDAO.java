@@ -1,5 +1,6 @@
 package com.itq.userservice.dao;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -11,10 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.itq.userservice.dto.Ack;
 import com.itq.userservice.dto.User;
+import com.itq.userservice.dto.UserInsert;
+import com.itq.userservice.exception.MuseumNotFoundException;
 import com.itq.userservice.exception.UserNotFoundException;
 
 @Component
@@ -90,6 +95,58 @@ public class UserDAO {
     public boolean existsUserID(int idUser) throws UserNotFoundException {
 
         return getUsersIDs().contains(idUser);
+
+    }
+
+    public User insertUser(UserInsert user) throws Exception {
+
+        String sql = "INSERT INTO user (idMuseum, name, lastName, phoneNumber, email, age, connected) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        LOGGER.info("INSERTING USER");
+
+        if(!existMuseumID(user.getIdMuseum())){
+
+            LOGGER.error("THE MUSEUM " +user.getIdMuseum() +" WAS NOT FOUND IN THE DATA BASE");
+            throw new MuseumNotFoundException("THE MUSEUM " +user.getIdMuseum() +" WAS NOT FOUND IN THE DATA BASE");
+
+        }
+        else{
+
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement(sql, new String[] { "idArtWork" });
+                ps.setInt(1, user.getIdMuseum());
+                ps.setString(2, user.getName());
+                ps.setString(3, user.getLastName());
+                ps.setString(4, user.getPhoneNumber());
+                ps.setString(5, user.getEmail());
+                ps.setInt(6, user.getAge());
+                ps.setBoolean(7, user.isConnected());
+                return ps;
+            }, keyHolder);
+
+            return new User(user, keyHolder.getKey().intValue());
+            
+        }
+    }
+
+    private boolean existMuseumID(int idMuseum) {
+        return getMuseumIDs().contains(idMuseum);
+    }
+
+    public List<Integer> getMuseumIDs() throws MuseumNotFoundException {
+
+        String sql = "SELECT idMuseum FROM Museum";
+        LOGGER.info("GETTING MUSEUM IDs");
+        return jdbcTemplate.query(sql,new RowMapper<Integer>() {
+            @Override
+            public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Integer idMuseum = Integer.valueOf(rs.getInt("idMuseum"));
+                return idMuseum;
+            }
+
+        });
 
     }
 
