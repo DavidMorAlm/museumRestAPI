@@ -47,5 +47,8 @@ public class UserBusiness {
         return userDAO.updateUser(user);
     }
 
+    public User deleteUser(Integer idUser) throws Exception {
+        return userDAO.deleteUser(idUser);
+    }
 	
 }

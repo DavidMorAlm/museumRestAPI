@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -121,6 +122,28 @@ public class UserServiceController {
 
 			LOGGER.error("ERROR UPDATING USER", e);
 			return new ResponseEntity<>(new Ack(500, "ERROR UPDATING USER"), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
+	@DeleteMapping("/user")
+	public ResponseEntity<?> deleteUser(@RequestParam(value = "idUser", required = true) Integer idUser) {
+
+		try {
+
+			userBusiness.deleteUser(idUser);
+			return new ResponseEntity<>(new Ack(200, "USER DELETED"), HttpStatus.OK);
+
+		} catch (UserNotFoundException e) {
+
+			LOGGER.error("ERROR DELETING USER, USER " +idUser +" NOT FOUND IN THE DATA BASE", e);
+			return new ResponseEntity<>(new Ack(404, "ERROR DELETING USER, USER " +idUser +" NOT FOUND IN THE DATA BASE"), HttpStatus.NOT_FOUND);
+
+		} catch (Exception e) {
+
+			LOGGER.error("ERROR DELETING USER", e);
+			return new ResponseEntity<>(new Ack(500, "ERROR DELETING USER"), HttpStatus.INTERNAL_SERVER_ERROR);
+
 		}
 
 	}

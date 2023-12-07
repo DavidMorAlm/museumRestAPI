@@ -199,4 +199,26 @@ public class UserDAO {
         }
     }
 
+    public User deleteUser(int idUser) throws Exception {
+
+        String sql = "DELETE FROM user WHERE idUser = ?";
+
+        LOGGER.info("LOOKING FOR USER WITH ID: " + idUser + " TO DELETE");
+        User userResult = getUserByID(idUser);
+
+        if (userResult == null) {
+
+            LOGGER.error("USER " + idUser + " NOT FOUND");
+            throw new UserNotFoundException("USER " + idUser + " NOT FOUND");
+
+        } else {
+
+            LOGGER.info("DELETING USER");
+            jdbcTemplate.update(sql, idUser);
+            LOGGER.info("USER DELETED");
+            return userResult;
+
+        }
+    }
+
 }
