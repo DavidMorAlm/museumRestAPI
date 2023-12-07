@@ -487,7 +487,7 @@ components:
           type: boolean
           description: To know if the artwork is currently available on the hall
           example: true
-      description: Structure for the requestBody used in the location update method
+      description: Structure for the requestBody used in the ArtWork update method
   
     # Defining User properties.
     User:
@@ -541,7 +541,7 @@ components:
           example: true
       description: Params/structure for a User.
       
-    # Structure of a requestBody for a new ArtWork insertion
+    # Structure of a requestBody for a new User insertion
     UserInsert:    
       type: object
       required:
@@ -587,7 +587,7 @@ components:
           example: true
       description: Params/structure for a User when its posted.
       
-    # Schema for the requestBody for an ArtWork update
+    # Schema for the requestBody for an User update
     UserUpdate:
       type: object
       required:
@@ -608,7 +608,7 @@ components:
           description: Email of a User
           maxLength: 50
           example: userone@museum.com
-      description: Structure for the requestBody used in the user update method
+      description: Structure for the requestBody used in the User update method
 
     # Defining Hall properties
     Hall:
