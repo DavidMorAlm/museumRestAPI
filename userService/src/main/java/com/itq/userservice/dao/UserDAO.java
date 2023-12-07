@@ -63,20 +63,23 @@ public class UserDAO {
 	}
 
 	public User getUserByID(int idUser) throws Exception {
-        try {
-        	String sql = "SELECT idUser FROM user WHERE idUser = ?";
-        	if(!jdbcTemplate.queryForList(sql, idUser).isEmpty()) {
+        
+        String sql = "SELECT * FROM user WHERE idUser = ?";
 
-        		return jdbcTemplate.queryForObject(sql, new UserRowMapper());
-        		
+        try {
+
+            if(!existsUserID(idUser)){
+
+                LOGGER.error("THE USER " +idUser +" WAS NOT FOUND IN THE DATA BASE");
+                throw new UserNotFoundException("THE USER " +idUser +" WAS NOT FOUND IN THE DATA BASE");
+
             }
-        	else {
-        		
-        		LOGGER.error("THE USER " +idUser +" WAS NOT FOUND IN THE DATA BASE");
-        		throw new UserNotFoundException("THE USER " +idUser +" WAS NOT FOUND IN THE DATA BASE");
-        		
-        	}
-        	
+            else{
+
+                LOGGER.info("SHOWING USER WITH ID " +idUser);
+                return jdbcTemplate.queryForObject(sql, new UserRowMapper(), idUser);
+
+            }
         }catch (UserNotFoundException e) {
 
             throw new UserNotFoundException("THE USER " +idUser +" WAS NOT FOUND IN THE DATA BASE");
@@ -87,4 +90,35 @@ public class UserDAO {
 
         }
 	}
+
+    public List<Integer> getUsersIDs() throws UserNotFoundException {
+
+        String sql = "SELECT idUser FROM User";
+
+        try {
+
+            LOGGER.info("GETTING USERS IDs");
+            return jdbcTemplate.query(sql,new RowMapper<Integer>() {
+                @Override
+                public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    Integer idUser = Integer.valueOf(rs.getInt("idUser"));
+                    return idUser;
+                }
+
+            });
+
+        } catch (UserNotFoundException e) {
+
+            throw new UserNotFoundException("THERE WAS A PROBLEM WHILE QUERING USERS IDs");
+
+        }
+
+    }
+
+    public boolean existsUserID(int idUser) throws UserNotFoundException {
+
+        return getUsersIDs().contains(idUser);
+
+    }
+
 }

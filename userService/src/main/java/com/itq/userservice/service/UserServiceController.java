@@ -14,6 +14,7 @@ import com.itq.userservice.business.UserBusiness;
 import com.itq.userservice.dto.Ack;
 import com.itq.userservice.dto.User;
 import com.itq.userservice.exception.InvalidRequestException;
+import com.itq.userservice.exception.UserNotFoundException;
 
 @RestController
 public class UserServiceController {
@@ -63,7 +64,12 @@ public class UserServiceController {
 				User user = userBusiness.getUserByID(idUser);
 				return new ResponseEntity<>(user, HttpStatus.OK);
 
-			} catch (InvalidRequestException e) {
+			} catch (UserNotFoundException e) {
+
+				LOGGER.error("ERROR GETTING USER", e);
+				return new ResponseEntity<>(new Ack(404, e.getMessage()), HttpStatus.NOT_FOUND);
+
+			}catch (InvalidRequestException e) {
 				
 				LOGGER.error("ERROR GETING USERS, VERIFY URL", e);
 				return new ResponseEntity<>(new Ack(404, "404,ERROR GETING USERS, VERIFY URL"), HttpStatus.BAD_REQUEST);
