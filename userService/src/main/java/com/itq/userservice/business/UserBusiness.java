@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import com.itq.userservice.dao.UserDAO;
 import com.itq.userservice.dto.User;
 import com.itq.userservice.dto.UserInsert;
+import com.itq.userservice.dto.UserUpdate;
 import com.itq.userservice.service.UserServiceController;
 
 @Service
@@ -40,6 +41,10 @@ public class UserBusiness {
 
     public User insertUser(UserInsert user) throws Exception{
         return userDAO.insertUser(user);
+    }
+
+    public User updateUser(UserUpdate user) throws Exception {
+        return userDAO.updateUser(user);
     }
 
 	

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.itq.userservice.dto.Ack;
 import com.itq.userservice.dto.User;
 import com.itq.userservice.dto.UserInsert;
+import com.itq.userservice.dto.UserUpdate;
 import com.itq.userservice.exception.MuseumNotFoundException;
 import com.itq.userservice.exception.UserNotFoundException;
 
@@ -115,7 +116,7 @@ public class UserDAO {
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(sql, new String[] { "idArtWork" });
+                PreparedStatement ps = connection.prepareStatement(sql, new String[] { "idUser" });
                 ps.setInt(1, user.getIdMuseum());
                 ps.setString(2, user.getName());
                 ps.setString(3, user.getLastName());
@@ -127,7 +128,7 @@ public class UserDAO {
             }, keyHolder);
 
             return new User(user, keyHolder.getKey().intValue());
-            
+
         }
     }
 
@@ -148,6 +149,54 @@ public class UserDAO {
 
         });
 
+    }
+
+    public User updateUser(UserUpdate user) throws Exception {
+
+        String sql = "UPDATE user SET phoneNumber = ? WHERE idUser = ?";
+
+        LOGGER.info("LOOKING FOR User WITH ID: " + user.getIdUser() + " TO UPDATE");
+        User userResult = getUserByID(user.getIdUser());
+
+        if (userResult == null) {
+
+            LOGGER.error("USER " + user.getIdUser() + " NOT FOUND");
+            throw new UserNotFoundException("USER " + user.getIdUser() + " NOT FOUND");
+
+        } else {
+
+            LOGGER.info("UPDATING USER");
+            String msg = "USER FIELDS UPDATED!";
+
+            if (userResult.getPhoneNumber() == user.getPhoneNumber()) {
+
+                LOGGER.debug("NO CHANGES FOR <phoneNumber>, NOT UPDATING");
+
+            } else {
+
+                LOGGER.debug("<phoneNumber> FOUND, UPDATING");
+                sql = "UPDATE user SET phoneNumber = ? WHERE idUser = ?";
+                jdbcTemplate.update(sql, user.getPhoneNumber(), user.getIdUser());
+                msg += " <phoneNumber: " + user.getPhoneNumber() + ">";
+
+            }
+            if (userResult.getEmail() == user.getEmail()) {
+
+                LOGGER.debug("NO CHANGES FOR <email>, NOT UPDATING");
+
+            } else {
+
+                LOGGER.debug("NEW <email> FOUND, UPDATING");
+                sql = "UPDATE user SET email = ? WHERE idUser = ?";
+                jdbcTemplate.update(sql, user.getEmail(), user.getIdUser());
+                msg += " <email: " + user.getEmail() + ">";
+
+            }
+
+            LOGGER.info(msg);
+            LOGGER.info("QUERING AND RETURNING UPDATED USER");
+            return getUserByID(user.getIdUser());
+        }
     }
 
 }

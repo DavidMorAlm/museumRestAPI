@@ -11,13 +11,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
+
 import com.itq.userservice.business.UserBusiness;
 import com.itq.userservice.dto.Ack;
 import com.itq.userservice.dto.User;
 import com.itq.userservice.dto.UserInsert;
+import com.itq.userservice.dto.UserUpdate;
 import com.itq.userservice.exception.InvalidRequestException;
 import com.itq.userservice.exception.MuseumNotFoundException;
 import com.itq.userservice.exception.UserNotFoundException;
@@ -99,4 +103,26 @@ public class UserServiceController {
 		}
 
 	}
+
+	@PutMapping(value = "/user", consumes = "application/json", produces = "application/json")
+	public ResponseEntity<?> updateUser(@Valid @RequestBody UserUpdate user) {
+
+		try {
+
+			return new ResponseEntity<>(userBusiness.updateUser(user), HttpStatus.OK);
+
+		} catch (UserNotFoundException e) {
+
+			LOGGER.error("ERROR UPDATING USER, USER " +user.getIdUser() +" NOT FOUND IN THE DATA BASE", e);
+			return new ResponseEntity<>(new Ack(404, "ERROR UPDATING USER, USER " +user.getIdUser() +" NOT FOUND IN THE DATA BASE"), HttpStatus.NOT_FOUND);
+
+		} 
+		catch (Exception e) {
+
+			LOGGER.error("ERROR UPDATING USER", e);
+			return new ResponseEntity<>(new Ack(500, "ERROR UPDATING USER"), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
 }
