@@ -47,7 +47,7 @@ public class UserServiceController {
 				if(user.isEmpty()) {
 					
 					LOGGER.info("No USERS found");
-					return new ResponseEntity<>(new Ack(204,"No USERS found"), HttpStatus.OK);
+					return new ResponseEntity<>(new Ack(204,"No USERS found"), HttpStatus.NO_CONTENT);
 					
 				}
 				else {
@@ -67,13 +67,13 @@ public class UserServiceController {
 		catch (UserNotFoundException e) {
 			
 			LOGGER.error("ERROR GETING USERS, USER NOT FOUND IN THE DATA BASE", e);
-			return new ResponseEntity<>(new Ack(404, "404,ERROR GETING USERS, USER NOT FOUND IN THE DATA BASE"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new Ack(204, "204,ERROR GETING USERS, USER NOT FOUND IN THE DATA BASE"), HttpStatus.NO_CONTENT);
 			
 		}
 		catch (InvalidRequestException e) {
 				
 			LOGGER.error("ERROR GETING USERS, VERIFY URL", e);
-			return new ResponseEntity<>(new Ack(404, "404,ERROR GETING USERS, VERIFY URL"), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new Ack(400, "400,ERROR GETING USERS, VERIFY URL"), HttpStatus.BAD_REQUEST);
 			
 		} catch (Exception e) {
 
@@ -94,7 +94,7 @@ public class UserServiceController {
 		} catch (MuseumNotFoundException e) {
 			
 			LOGGER.error("ERROR INSERTING USER, MUSEUM " +user.getIdMuseum() +" NOT FOUND IN THE DATA BASE", e);
-			return new ResponseEntity<>(new Ack(404, "ERROR INSERTING USER, MUSEUM " +user.getIdMuseum() +" NOT FOUND IN THE DATA BASE"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new Ack(204, "ERROR INSERTING USER, MUSEUM " +user.getIdMuseum() +" NOT FOUND IN THE DATA BASE"), HttpStatus.NO_CONTENT);
 
 		} catch (DuplicatedUserException e){
 
@@ -121,7 +121,7 @@ public class UserServiceController {
 		} catch (UserNotFoundException e) {
 
 			LOGGER.error("ERROR UPDATING USER, USER " +user.getIdUser() +" NOT FOUND IN THE DATA BASE", e);
-			return new ResponseEntity<>(new Ack(404, "ERROR UPDATING USER, USER " +user.getIdUser() +" NOT FOUND IN THE DATA BASE"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new Ack(204, "ERROR UPDATING USER, USER " +user.getIdUser() +" NOT FOUND IN THE DATA BASE"), HttpStatus.NO_CONTENT);
 
 		} 
 		catch (Exception e) {
@@ -144,7 +144,7 @@ public class UserServiceController {
 		} catch (UserNotFoundException e) {
 
 			LOGGER.error("ERROR DELETING USER, USER " +idUser +" NOT FOUND IN THE DATA BASE", e);
-			return new ResponseEntity<>(new Ack(404, "ERROR DELETING USER, USER " +idUser +" NOT FOUND IN THE DATA BASE"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new Ack(204, "ERROR DELETING USER, USER " +idUser +" NOT FOUND IN THE DATA BASE"), HttpStatus.NO_CONTENT);
 
 		} catch (Exception e) {
 
