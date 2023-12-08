@@ -4,11 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.RestTemplate;
 
 import com.itq.artworkservice.dao.ArtWorkDAO;
@@ -16,8 +12,6 @@ import com.itq.artworkservice.dto.ArtWork;
 import com.itq.artworkservice.dto.ArtWorkInsert;
 import com.itq.artworkservice.dto.ArtWorkUpdate;
 import com.itq.artworkservice.exception.ArtWorkNotFoundException;
-import com.itq.artworkservice.exception.*;
-//import com.itq.artworkservice.exception.hall.HallNotFoundException;//
 import com.itq.artworkservice.service.ArtWorkServiceController;
 
 import java.util.List;

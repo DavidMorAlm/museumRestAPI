@@ -2,13 +2,10 @@ package com.itq.userservice.business;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.itq.userservice.dao.UserDAO;
 import com.itq.userservice.dto.User;
@@ -22,8 +19,8 @@ public class UserBusiness {
 	@Autowired
 	private UserDAO userDAO;
 
-	private RestTemplate restTemplate = new RestTemplate();
-    private String USER_SERVICE_URL = "http://localhost:8080/user";
+	//private RestTemplate restTemplate = new RestTemplate();
+    //private String USER_SERVICE_URL = "http://localhost:8080/user";
     
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceController.class);
 
